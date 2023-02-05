@@ -59,4 +59,63 @@ describe("getting all the tokens", function() {
 
 });
 
+describe("getting all of my tokens", function() {
+  let NFTMarketplace;
+
+  beforeEach(async function() {
+     NFTMarketplace = await hre.ethers.getContractFactory("NFTMarketplace");
+     NFTMarketplace = await NFTMarketplace.deploy();
+  });
+  it("should give a empty array back", async function(){
+
+    const instance = await NFTMarketplace.deployed();
+
+    const tx = await instance.getMyNFTs();
+
+    const receipt = await tx;
+
+    const logs = receipt.logs;
+    console.log(logs);
+    console.log(tx);
+
+    expect(tx.length).to.equal(0);
+    expect(logs).to.undefined;
+
+  });
+
+
+});
+
+describe("getting all of my tokens with one token in there", function() {
+  let NFTMarketplace;
+
+  beforeEach(async function() {
+     NFTMarketplace = await hre.ethers.getContractFactory("NFTMarketplace");
+     NFTMarketplace = await NFTMarketplace.deploy();
+  });
+
+  it("should create a new token", async function() {
+    const tokenURI = "https://ipfs.io/ipfs/QmWATWQ7fVPP2EFGu71UkfnqhYXDYH566qy47CnJDgvs8u";
+    const price = ethers.utils.parseUnits("0.01", "ether").toString();
+
+    const instance = await NFTMarketplace.deployed();
+    const tx = await instance.createToken(tokenURI, price, {
+      from: (await hre.ethers.getSigners())[0]._address,
+      value: price
+    });
+    const receipt = await tx.wait();
+   const test = await  instance.getMyNFTs();
+   
+   const logs = await test.logs;
+   console.log(logs);
+    console.log(test);
+
+   
+  expect(test.owner).to.equal(tx._address);
+
+  });
+});
+
+
+
 
